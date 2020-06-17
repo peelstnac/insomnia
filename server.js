@@ -46,6 +46,7 @@ class Player {
     x = Math.floor(Math.random() * WIDTH);
     y = Math.floor(Math.random() * HEIGHT);
     vel = 10;
+    ang = 0;
     dx = 0;
     dy = 0;
     dim = 32;
@@ -75,6 +76,11 @@ io.on('connection', (socket) => {
     var id = uuidv4();
     socketList[id] = socket;
     playerList[id] = new Player(id, 'hope');
+
+    server.on('cursorMove', (data) => {
+        var ang = Math.atan2(data.y - playerList[id].y, data.x - playerList[id].x);
+        playerList[id].ang = ang;
+    });
 
     socket.on('keyPress', (data) => {
         var keyArray = data.keyArray;

@@ -14,12 +14,22 @@
             const socket = io('http://localhost:3000');
             const WIDTH = 1280;
             const HEIGHT = 720;
+            //handle cursor
+            var mx = 0;
+            var my = 0;
+            //handle keys
             var keyArray = [0, 0, 0, 0, 0]; //w, a, s, d, space
             socket.on('state', (data) => {
                 //send key data
                 var packet = {};
                 packet.keyArray = keyArray;
                 socket.emit('keyPress', packet);
+                //send mouse data
+                packet = {
+                    x: mx,
+                    y: my
+                };
+                socket.emit('cursorMove', packet);
                 //console.log(data);
                 //parse data
                 var enemyList = data.enemyList;
@@ -37,7 +47,12 @@
                     ctx.fillRect(playerList[player].x-16, playerList[player].y-16, 32, 32);
                 }
             });
-
+            //handle mouse
+            c.addEventListener('mousemove', (event) => {
+                var rect = c.getBoundingClientRect();
+                mx = event.clientX - rect.left;
+                my = event.clientY - rect.top;
+            });
             //handle keys
             document.onkeydown = (event) => {
                 if(event.keyCode === 87) {
@@ -52,6 +67,9 @@
                 if(event.keyCode === 68) {
                     keyArray[3] = 1;
                 }
+                if(event.keyCode == 32) {
+                    keyArray[4] = 1;
+                }
             }
             document.onkeyup = (event) => {
                 if(event.keyCode === 87) {
@@ -65,6 +83,9 @@
                 }
                 if(event.keyCode === 68) {
                     keyArray[3] = 0;
+                }
+                if(event.keyCode == 32) {
+                    keyArray[4] = 0;
                 }
             }
         </script>
