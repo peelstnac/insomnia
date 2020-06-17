@@ -1,12 +1,14 @@
 <!DOCTYPE html>
 <html>
     <head>
+        <script src="https://code.jquery.com/jquery-3.5.1.slim.js" integrity="sha256-DrT5NfxfbHvMHux31Lkhxg42LY6of8TaYyK50jnxRnM=" crossorigin="anonymous"></script>
     </head>
     <body>
         <h1>insomnia</h1>
         <canvas id="ctx" width="1280" height="720" style="border:1px solid #000000;">
             Your browser does not support the HTML canvas tag.
         </canvas>
+        <p id = "ammo"></p>
         <script src="https://cdnjs.cloudflare.com/ajax/libs/socket.io/1.4.5/socket.io.min.js"></script>
         <script>
             var c = document.getElementById("ctx");
@@ -14,6 +16,12 @@
             const socket = io('http://localhost:3000');
             const WIDTH = 1280;
             const HEIGHT = 720;
+
+            var id;
+            socket.on('id', (data) => {
+                id = data.id;
+            });
+
             //handle cursor
             var mx = 0;
             var my = 0;
@@ -53,6 +61,9 @@
                     ctx.fillRect(projectileList[proj].x - projectileList[proj].dim/2, 
                     projectileList[proj].y - projectileList[proj].dim/2, projectileList[proj].dim, projectileList[proj].dim);
                 }
+                //display ammo
+                $('#ammo').empty();
+                $('#ammo').append(playerList[id].ammo);
             });
             //handle mouse
             c.addEventListener('mousemove', (event) => {

@@ -38,6 +38,8 @@ class Enemy {
 var socketList = {};
 var playerList = {};
 
+const ammo_cost = [1];
+
 class Player {
     constructor(id, name) {
         this.id = id;
@@ -51,6 +53,8 @@ class Player {
     dy = 0;
     dim = 32;
     hp = 150;
+    ammo = [100];
+    weapon = 0;
 
     updatePosition() {
         if(this.x <= 0 || this.x + this.dim/2 >= WIDTH) {
@@ -103,6 +107,9 @@ app.get('/', (req, res) => {
 io.on('connection', (socket) => {
     console.log('player connect.');
     var id = uuidv4();
+    socket.emit('id', {
+        id: id
+    });
     socketList[id] = socket;
     playerList[id] = new Player(id, 'hope');
 
@@ -126,8 +133,11 @@ io.on('connection', (socket) => {
             if(playerList[id].x <= WIDTH - 32/2) playerList[id].x += playerList[id].vel / Math.sqrt(2);
         }
         if(keyArray[4]) {
-            var proj = new Projectile(playerList[id].x, playerList[id].y, 15, playerList[id].ang, 6, 30, id, 5);
-            projectileList.push(proj);
+            if(playerList[id].ammo >= ammo_cost[playerList[id].weapon]) {
+                var proj = new Projectile(playerList[id].x, playerList[id].y, 15, playerList[id].ang, 6, 30, id, 5);
+                projectileList.push(proj);
+                playerList[id].ammo[playerList[id].weapon] -= ammo_cost[playerList[id].weapon];
+            }
         }
     });
 
@@ -163,6 +173,10 @@ setInterval(() => {
             if(Math.abs(bx - px) < 16+projectileList[proj].dim/2 && Math.abs(by - py) < 16+projectileList[proj].dim/2) {
                 playerList[player].hp -= projectileList[proj].dmg;
                 projectileList[proj].timer = 0;
+                if(playerList[player].hp <= 0) {
+                    //transfer ammo to killer
+                    playerList[projectileList[proj].parent].ammo[0] += playerList[player].ammo;
+                }
             }
         }
         for(var enemy in enemyList) {
@@ -171,6 +185,10 @@ setInterval(() => {
             if(Math.abs(bx - ex) < 25+projectileList[proj].dim/2 && Math.abs(ey - py) < 25+projectileList[proj].dim/2) {
                 enemyList[enemy].hp -= projectileList[proj].dmg;
                 projectileList[proj].timer = 0;
+                if(enemyList[enemy].hp <= 0) {
+                    //give killer 30 ammo
+                    playerList[projectileList[proj].parent].ammo[0] += 30;
+                }
             }
         }
     }
