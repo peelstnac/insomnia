@@ -113,6 +113,12 @@ io.on('connection', (socket) => {
     socketList[id] = socket;
     playerList[id] = new Player(id, 'hope');
 
+    socket.on('disconnect', () => {
+        console.log('player disconnect.');
+        delete socketList[id];
+        delete playerList[id];
+    });
+
     socket.on('cursorMove', (data) => {
         var ang = Math.atan2(data.y - playerList[id].y, data.x - playerList[id].x);
         playerList[id].ang = ang;
@@ -139,12 +145,6 @@ io.on('connection', (socket) => {
                 playerList[id].ammo[playerList[id].weapon] -= ammo_cost[playerList[id].weapon];
             }
         }
-    });
-
-    socket.on('disconnect', () => {
-        console.log('player disconnect.');
-        delete socketList[id];
-        delete playerList[id];
     });
 });
 
