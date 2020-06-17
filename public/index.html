@@ -1,9 +1,17 @@
 <!DOCTYPE html>
 <html>
-    <head></head>
+    <head>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/socket.io/1.4.5/socket.io.min.js"></script>
+        <script>
+            const socket = io('http://localhost:3000');
+            socket.on('state', (data) => {
+                console.log(data);
+            });
+        </script>
+    </head>
     <body>
         <h1>insomnia</h1>
-        <canvas id="myCanvas" width="500" height="500" style="border:1px solid #000000;">
+        <canvas id="game" width="500" height="500" style="border:1px solid #000000;">
             Your browser does not support the HTML canvas tag.
         </canvas>
     </body>
