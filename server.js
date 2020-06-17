@@ -3,8 +3,8 @@ const express = require('express');
 const server = require('http').Server(app);
 const io = require('socket.io')(server);
 
-const WIDTH = 750;
-const HEIGHT = 750;
+const WIDTH = 1280;
+const HEIGHT = 720;
 const PI = 3.141582;
 
 var enemyCount = 0;
@@ -18,13 +18,19 @@ class Enemy {
     y = 750/2;
     vel = Math.floor(Math.random() * 10) + 10;
     ang = Math.random() * PI;
-    dx = Math.cos(ang) * vel;
-    dy = Math.sin(ang) * vel;
-}
+    dx = Math.cos(this.ang) * this.vel;
+    dy = Math.sin(this.ang) * this.vel;
+    dim = 50;
 
-function updateEnemies(enemyList) {
-    for(var enemy in enemyList) {
-
+    updatePosition() {
+        if(this.x <= 0 || this.x + this.dim/2 >= WIDTH) {
+            this.dx = -this.dx;
+        }
+        if(this.y <= 0 || this.y + this.dim/2 >= HEIGHT) {
+            this.dy = -this.dy;
+        }
+        this.x += this.dx;
+        this.y += this.dy;
     }
 }
 
@@ -41,7 +47,10 @@ io.on('connection', (socket) => {
 
 setInterval(() => {
     var packet = {};
-    updateEnemies(enemyList);
+    //update enemy positions
+    for(enemy in enemyList) {
+        enemyList[enemy].updatePosition();
+    }
     //generate enemies if there are less than 10
     while(enemyCount < 10) {
         enemyCount++;
