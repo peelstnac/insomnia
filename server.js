@@ -225,10 +225,10 @@ setInterval(() => {
     for(proj in projectileList) {
         projectileList[proj].updatePosition();
     }
-    packet.enemyList = enemyList;
+    //packet.enemyList = enemyList;
     //add players to state
     packet.playerList = playerList;
     //add projectiles to state
-    packet.projectileList = projectileList;
+    //packet.projectileList = projectileList;
     io.emit('state', packet);
 }, 1000/15);
