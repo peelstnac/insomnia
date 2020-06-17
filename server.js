@@ -98,7 +98,7 @@ class Projectile {
 var projectileList = [];
 
 app.use(express.static(__dirname + '/public'));
-server.listen(process.env.PORT || 80);
+server.listen(80);
 
 app.get('/', (req, res) => {
   res.sendFile(__dirname + '/public/index.html');
