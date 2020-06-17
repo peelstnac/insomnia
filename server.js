@@ -175,7 +175,7 @@ setInterval(() => {
                 projectileList[proj].timer = 0;
                 if(playerList[player].hp <= 0) {
                     //transfer ammo to killer
-                    playerList[projectileList[proj].parent].ammo[0] += playerList[player].ammo;
+                    playerList[projectileList[proj].parent].ammo[0] += playerList[player].ammo[0];
                 }
             }
         }
@@ -187,7 +187,7 @@ setInterval(() => {
                 projectileList[proj].timer = 0;
                 if(enemyList[enemy].hp <= 0) {
                     //give killer 30 ammo
-                    playerList[projectileList[proj].parent].ammo[0] += 30;
+                    playerList[projectileList[proj].parent].ammo[0] += 15;
                 }
             }
         }

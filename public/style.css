@@ -1,0 +1,35 @@
+.night {
+    color: #fff;
+}
+
+.day {
+    color: #000;
+}
+
+#title {
+    text-align: center;
+    margin: 20px;
+}
+
+#mainc {
+    position: absolute;
+    width: 100vw;
+    height: 100vh;
+}
+
+#game {
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+}
+
+body, html {
+    height: 100%;
+    margin: 0;
+}
+
+body {
+    /* background-image: url("https://static.zerochan.net/Pixiv.Id.15544206.full.2065226.jpg"); */
+    background-size: cover;
+}

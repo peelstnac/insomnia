@@ -1,111 +1,129 @@
 <!DOCTYPE html>
 <html>
     <head>
+        <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.4.1/css/bootstrap.min.css" integrity="sha384-Vkoo8x4CGsO3+Hhxv8T/Q5PaXtkKtu6ug5TOeNV6gBiFeWPGFN9MuhOf23Q9Ifjh" crossorigin="anonymous">
+        <script src="https://code.jquery.com/jquery-3.4.1.slim.min.js" integrity="sha384-J6qa4849blE2+poT4WnyKhv5vZF5SrPo0iEjwBvKU7imGFAV0wwj1yYfoRSJoZ+n" crossorigin="anonymous"></script>
+        <script src="https://cdn.jsdelivr.net/npm/popper.js@1.16.0/dist/umd/popper.min.js" integrity="sha384-Q6E9RHvbIyZFJoft+2mJbHaEWldlvI9IOYy5n3zV9zzTtmI3UksdQRVvoxMfooAo" crossorigin="anonymous"></script>
+        <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.4.1/js/bootstrap.min.js" integrity="sha384-wfSDF2E50Y2D1uUdj0O3uMBJnjuUD4Ih7YwaYd1iqfktj0Uod8GCExl3Og8ifwB6" crossorigin="anonymous"></script>
+
+        <link rel="stylesheet" href="style.css">
         <script src="https://code.jquery.com/jquery-3.5.1.slim.js" integrity="sha256-DrT5NfxfbHvMHux31Lkhxg42LY6of8TaYyK50jnxRnM=" crossorigin="anonymous"></script>
     </head>
     <body>
-        <h1>insomnia</h1>
-        <canvas id="ctx" width="1280" height="720" style="border:1px solid #000000;">
-            Your browser does not support the HTML canvas tag.
-        </canvas>
-        <p id = "ammo"></p>
-        <script src="https://cdnjs.cloudflare.com/ajax/libs/socket.io/1.4.5/socket.io.min.js"></script>
-        <script>
-            var c = document.getElementById("ctx");
-            var ctx = c.getContext("2d");
-            const socket = io('http://localhost:3000');
-            const WIDTH = 1280;
-            const HEIGHT = 720;
+        <div class = "container-fluid" id="mainc">
+            <h1 id="title">insomnia</h1>
+            <div class="text-center" id="game">
+                <canvas id="ctx" width="1280" height="720" style="border:1px solid #000000;">
+                    Your browser does not support the HTML canvas tag.
+                </canvas>
+                <div class="row">
+                    <div class="col-md-1"></div>
+                    <div class="col-md-2">Time: </div>
+                    <div class="col-md-2">Weapon: </div>
+                    <div class="col-md-2">Ammo: <span id="ammo"></span></div>
+                    <div class="col-md-2">Kills: </div>
+                    <div class="col-md-2">Deaths: </div>
+                    <div class="col-md-1"></div>
+                </div>
+            </div>
+            <script src="https://cdnjs.cloudflare.com/ajax/libs/socket.io/1.4.5/socket.io.min.js"></script>
+            <script>
+                var c = document.getElementById("ctx");
+                var ctx = c.getContext("2d");
+                const socket = io('http://localhost:3000');
+                const WIDTH = 1280;
+                const HEIGHT = 720;
 
-            var id;
-            socket.on('id', (data) => {
-                id = data.id;
-            });
+                var id;
+                socket.on('id', (data) => {
+                    id = data.id;
+                });
 
-            //handle cursor
-            var mx = 0;
-            var my = 0;
-            //handle keys
-            var keyArray = [0, 0, 0, 0, 0]; //w, a, s, d, space
-            socket.on('state', (data) => {
-                //send key data
-                var packet = {};
-                packet.keyArray = keyArray;
-                socket.emit('keyPress', packet);
-                //send mouse data
-                packet = {
-                    x: mx,
-                    y: my
-                };
-                socket.emit('cursorMove', packet);
-                //console.log(data);
-                //parse data
-                var enemyList = data.enemyList;
-                ctx.clearRect(0, 0, WIDTH, HEIGHT);
-                ctx.fillStyle = 'red';
-                for(var enemy in enemyList) {
-                    ctx.fillText('enemy', enemyList[enemy].x-25, enemyList[enemy].y-30);
-                    ctx.fillRect(enemyList[enemy].x-25, enemyList[enemy].y-25, 50, 50);
-                    //console.log(enemy.x);
+                //handle cursor
+                var mx = 0;
+                var my = 0;
+                //handle keys
+                var keyArray = [0, 0, 0, 0, 0]; //w, a, s, d, space
+                socket.on('state', (data) => {
+                    //send key data
+                    var packet = {};
+                    packet.keyArray = keyArray;
+                    socket.emit('keyPress', packet);
+                    //send mouse data
+                    packet = {
+                        x: mx,
+                        y: my
+                    };
+                    socket.emit('cursorMove', packet);
+                    //console.log(data);
+                    //parse data
+                    var enemyList = data.enemyList;
+                    ctx.clearRect(0, 0, WIDTH, HEIGHT);
+                    ctx.fillStyle = 'red';
+                    for(var enemy in enemyList) {
+                        ctx.fillText('enemy', enemyList[enemy].x-25, enemyList[enemy].y-30);
+                        ctx.fillRect(enemyList[enemy].x-25, enemyList[enemy].y-25, 50, 50);
+                        //console.log(enemy.x);
+                    }
+                    //parse data
+                    var playerList = data.playerList;
+                    ctx.fillStyle = 'green';
+                    for(var player in playerList) {
+                        ctx.fillRect(playerList[player].x-16, playerList[player].y-16, 32, 32);
+                    }
+                    //parse data
+                    var projectileList = data.projectileList;
+                    //console.log(projectileList);
+                    for(var proj in projectileList) {
+                        ctx.fillRect(projectileList[proj].x - projectileList[proj].dim/2, 
+                        projectileList[proj].y - projectileList[proj].dim/2, projectileList[proj].dim, projectileList[proj].dim);
+                    }
+                    //display ammo
+                    $('#ammo').empty();
+                    $('#ammo').append(playerList[id].ammo);
+                });
+                //handle mouse
+                c.addEventListener('mousemove', (event) => {
+                    var rect = c.getBoundingClientRect();
+                    mx = event.clientX - rect.left;
+                    my = event.clientY - rect.top;
+                });
+                //handle keys
+                document.onkeydown = (event) => {
+                    if(event.keyCode === 87) {
+                        keyArray[0] = 1;
+                    }
+                    if(event.keyCode === 65) {
+                        keyArray[1] = 1;
+                    }
+                    if(event.keyCode === 83) {
+                        keyArray[2] = 1;
+                    }
+                    if(event.keyCode === 68) {
+                        keyArray[3] = 1;
+                    }
+                    if(event.keyCode == 32) {
+                        keyArray[4] = 1;
+                    }
                 }
-                //parse data
-                var playerList = data.playerList;
-                ctx.fillStyle = 'green';
-                for(var player in playerList) {
-                    ctx.fillRect(playerList[player].x-16, playerList[player].y-16, 32, 32);
+                document.onkeyup = (event) => {
+                    if(event.keyCode === 87) {
+                        keyArray[0] = 0;
+                    }
+                    if(event.keyCode === 65) {
+                        keyArray[1] = 0;
+                    }
+                    if(event.keyCode === 83) {
+                        keyArray[2] = 0;
+                    }
+                    if(event.keyCode === 68) {
+                        keyArray[3] = 0;
+                    }
+                    if(event.keyCode == 32) {
+                        keyArray[4] = 0;
+                    }
                 }
-                //parse data
-                var projectileList = data.projectileList;
-                //console.log(projectileList);
-                for(var proj in projectileList) {
-                    ctx.fillRect(projectileList[proj].x - projectileList[proj].dim/2, 
-                    projectileList[proj].y - projectileList[proj].dim/2, projectileList[proj].dim, projectileList[proj].dim);
-                }
-                //display ammo
-                $('#ammo').empty();
-                $('#ammo').append(playerList[id].ammo);
-            });
-            //handle mouse
-            c.addEventListener('mousemove', (event) => {
-                var rect = c.getBoundingClientRect();
-                mx = event.clientX - rect.left;
-                my = event.clientY - rect.top;
-            });
-            //handle keys
-            document.onkeydown = (event) => {
-                if(event.keyCode === 87) {
-                    keyArray[0] = 1;
-                }
-                if(event.keyCode === 65) {
-                    keyArray[1] = 1;
-                }
-                if(event.keyCode === 83) {
-                    keyArray[2] = 1;
-                }
-                if(event.keyCode === 68) {
-                    keyArray[3] = 1;
-                }
-                if(event.keyCode == 32) {
-                    keyArray[4] = 1;
-                }
-            }
-            document.onkeyup = (event) => {
-                if(event.keyCode === 87) {
-                    keyArray[0] = 0;
-                }
-                if(event.keyCode === 65) {
-                    keyArray[1] = 0;
-                }
-                if(event.keyCode === 83) {
-                    keyArray[2] = 0;
-                }
-                if(event.keyCode === 68) {
-                    keyArray[3] = 0;
-                }
-                if(event.keyCode == 32) {
-                    keyArray[4] = 0;
-                }
-            }
-        </script>
+            </script>
+        </div>
     </body>
 </html>
