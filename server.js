@@ -16,7 +16,7 @@ class Enemy {
     }
     x = WIDTH/2;
     y = HEIGHT/2;
-    vel = Math.floor(Math.random() * 5) + 10;
+    vel = 20;
     ang = Math.random() * PI;
     dx = Math.cos(this.ang) * this.vel;
     dy = Math.sin(this.ang) * this.vel;
@@ -47,7 +47,7 @@ class Player {
     }
     x = Math.floor(Math.random() * WIDTH);
     y = Math.floor(Math.random() * HEIGHT);
-    vel = 10;
+    vel = 15;
     ang = 0;
     dx = 0;
     dy = 0;
@@ -140,7 +140,7 @@ io.on('connection', (socket) => {
         }
         if(keyArray[4]) {
             if(playerList[id].ammo >= ammo_cost[playerList[id].weapon]) {
-                var proj = new Projectile(playerList[id].x, playerList[id].y, 15, playerList[id].ang, 6, 30, id, 5);
+                var proj = new Projectile(playerList[id].x, playerList[id].y, 30, playerList[id].ang, 6, 15, id, 10);
                 projectileList.push(proj);
                 playerList[id].ammo[playerList[id].weapon] -= ammo_cost[playerList[id].weapon];
             }
@@ -231,4 +231,4 @@ setInterval(() => {
     //add projectiles to state
     packet.projectileList = projectileList;
     io.emit('state', packet);
-}, 1000/30);
+}, 1000/15);
