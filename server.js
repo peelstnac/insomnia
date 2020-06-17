@@ -64,6 +64,34 @@ class Player {
     }
 }
 
+class Projectile extends enemy {
+    constructor(x, y, vel, ang, dim, timer, parent) {
+        this.x = x;
+        this.y = y;
+        this.vel = vel;
+        this.ang = ang;
+        this.dim = dim;
+        this.timer = timer;
+        this.parent = parent;
+    }
+    dx = Math.cos(this.ang) * this.vel;
+    dy = Math.sin(this.ang) * this.vel;
+
+    updatePosition() {
+        this.timer--;
+        if(this.x <= 0 || this.x + this.dim/2 >= WIDTH) {
+            this.dx = -this.dx;
+        }
+        if(this.y <= 0 || this.y + this.dim/2 >= HEIGHT) {
+            this.dy = -this.dy;
+        }
+        this.x += this.dx;
+        this.y += this.dy;
+    }
+}
+
+var projectileList = [];
+
 app.use(express.static(__dirname + '/public'));
 server.listen(3000);
 
