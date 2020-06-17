@@ -14,17 +14,59 @@
             const socket = io('http://localhost:3000');
             const WIDTH = 1280;
             const HEIGHT = 720;
+            var keyArray = [0, 0, 0, 0, 0]; //w, a, s, d, space
             socket.on('state', (data) => {
+                //send key data
+                var packet = {};
+                packet.keyArray = keyArray;
+                socket.emit('keyPress', packet);
                 //console.log(data);
                 //parse data
                 var enemyList = data.enemyList;
                 ctx.clearRect(0, 0, WIDTH, HEIGHT);
                 ctx.fillStyle = 'red';
                 for(var enemy in enemyList) {
+                    ctx.fillText('enemy', enemyList[enemy].x-25, enemyList[enemy].y-30);
                     ctx.fillRect(enemyList[enemy].x-25, enemyList[enemy].y-25, 50, 50);
                     //console.log(enemy.x);
                 }
+                //parse data
+                var playerList = data.playerList;
+                ctx.fillStyle = 'green';
+                for(var player in playerList) {
+                    ctx.fillRect(playerList[player].x-16, playerList[player].y-16, 32, 32);
+                }
             });
+
+            //handle keys
+            document.onkeydown = (event) => {
+                if(event.keyCode === 87) {
+                    keyArray[0] = 1;
+                }
+                if(event.keyCode === 65) {
+                    keyArray[1] = 1;
+                }
+                if(event.keyCode === 83) {
+                    keyArray[2] = 1;
+                }
+                if(event.keyCode === 68) {
+                    keyArray[3] = 1;
+                }
+            }
+            document.onkeyup = (event) => {
+                if(event.keyCode === 87) {
+                    keyArray[0] = 0;
+                }
+                if(event.keyCode === 65) {
+                    keyArray[1] = 0;
+                }
+                if(event.keyCode === 83) {
+                    keyArray[2] = 0;
+                }
+                if(event.keyCode === 68) {
+                    keyArray[3] = 0;
+                }
+            }
         </script>
     </body>
 </html>
