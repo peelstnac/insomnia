@@ -231,4 +231,4 @@ setInterval(() => {
     //add projectiles to state
     packet.projectileList = projectileList;
     io.emit('state', packet);
-}, 1000/30);
+}, 1000/20);
