@@ -64,7 +64,7 @@ class Player {
     }
 }
 
-class Projectile extends enemy {
+class Projectile {
     constructor(x, y, vel, ang, dim, timer, parent) {
         this.x = x;
         this.y = y;
@@ -73,9 +73,9 @@ class Projectile extends enemy {
         this.dim = dim;
         this.timer = timer;
         this.parent = parent;
+        this.dx = Math.cos(this.ang) * this.vel;
+        this.dy = Math.sin(this.ang) * this.vel;
     }
-    dx = Math.cos(this.ang) * this.vel;
-    dy = Math.sin(this.ang) * this.vel;
 
     updatePosition() {
         this.timer--;
@@ -105,7 +105,7 @@ io.on('connection', (socket) => {
     socketList[id] = socket;
     playerList[id] = new Player(id, 'hope');
 
-    server.on('cursorMove', (data) => {
+    socket.on('cursorMove', (data) => {
         var ang = Math.atan2(data.y - playerList[id].y, data.x - playerList[id].x);
         playerList[id].ang = ang;
     });
@@ -123,6 +123,10 @@ io.on('connection', (socket) => {
         }
         if(keyArray[3]) {
             if(playerList[id].x <= WIDTH - 32/2) playerList[id].x += playerList[id].vel / Math.sqrt(2);
+        }
+        if(keyArray[4]) {
+            var proj = new Projectile(playerList[id].x, playerList[id].y, 15, playerList[id].ang, 6, 30, id);
+            projectileList.push(proj);
         }
     });
 
@@ -160,6 +164,12 @@ setInterval(() => {
             enemyList[enemy] = new Enemy('enemy');
         }
     }
+    //check if projectile is alive
+    for(var i = projectileList.length-1; i >= 0; i--) {
+        if(projectileList[i].timer <= 0) {
+            projectileList.splice(i, 1); //if not, remove
+        }
+    }
 
     var packet = {};
     //update enemy positions
@@ -171,8 +181,14 @@ setInterval(() => {
         enemyCount++;
         enemyList.push(new Enemy('test'));
     }
+    //update projectile positions
+    for(proj in projectileList) {
+        projectileList[proj].updatePosition();
+    }
     packet.enemyList = enemyList;
     //add players to state
     packet.playerList = playerList;
+    //add projectiles to state
+    packet.projectileList = projectileList;
     io.emit('state', packet);
 }, 1000/30);

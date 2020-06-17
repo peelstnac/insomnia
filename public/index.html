@@ -46,6 +46,13 @@
                 for(var player in playerList) {
                     ctx.fillRect(playerList[player].x-16, playerList[player].y-16, 32, 32);
                 }
+                //parse data
+                var projectileList = data.projectileList;
+                //console.log(projectileList);
+                for(var proj in projectileList) {
+                    ctx.fillRect(projectileList[proj].x - projectileList[proj].dim/2, 
+                    projectileList[proj].y - projectileList[proj].dim/2, projectileList[proj].dim, projectileList[proj].dim);
+                }
             });
             //handle mouse
             c.addEventListener('mousemove', (event) => {
