@@ -225,7 +225,7 @@ setInterval(() => {
     for(proj in projectileList) {
         projectileList[proj].updatePosition();
     }
-    //packet.enemyList = enemyList;
+    packet.enemyList = enemyList;
     //add players to state
     packet.playerList = playerList;
     //add projectiles to state
