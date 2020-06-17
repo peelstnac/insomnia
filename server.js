@@ -65,7 +65,7 @@ class Player {
 }
 
 class Projectile {
-    constructor(x, y, vel, ang, dim, timer, parent) {
+    constructor(x, y, vel, ang, dim, timer, parent, dmg) {
         this.x = x;
         this.y = y;
         this.vel = vel;
@@ -73,6 +73,7 @@ class Projectile {
         this.dim = dim;
         this.timer = timer;
         this.parent = parent;
+        this.dmg = dmg;
         this.dx = Math.cos(this.ang) * this.vel;
         this.dy = Math.sin(this.ang) * this.vel;
     }
@@ -125,7 +126,7 @@ io.on('connection', (socket) => {
             if(playerList[id].x <= WIDTH - 32/2) playerList[id].x += playerList[id].vel / Math.sqrt(2);
         }
         if(keyArray[4]) {
-            var proj = new Projectile(playerList[id].x, playerList[id].y, 15, playerList[id].ang, 6, 30, id);
+            var proj = new Projectile(playerList[id].x, playerList[id].y, 15, playerList[id].ang, 6, 30, id, 5);
             projectileList.push(proj);
         }
     });
@@ -149,6 +150,27 @@ setInterval(() => {
                 var temp = playerList[player].hp;
                 playerList[player].hp -= enemyList[enemy].hp;
                 enemyList[enemy].hp -= temp;
+            }
+        }
+    }
+    for(var proj in projectileList) {
+        var bx = projectileList[proj].x;
+        var by = projectileList[proj].y;
+        for(var player in playerList) {
+            if(player == projectileList[proj].parent) continue;
+            var px = playerList[player].x;
+            var py = playerList[player].y;
+            if(Math.abs(bx - px) < 16+projectileList[proj].dim/2 && Math.abs(by - py) < 16+projectileList[proj].dim/2) {
+                playerList[player].hp -= projectileList[proj].dmg;
+                projectileList[proj].timer = 0;
+            }
+        }
+        for(var enemy in enemyList) {
+            var ex = enemyList[enemy].x;
+            var ey = enemyList[enemy].y;
+            if(Math.abs(bx - ex) < 25+projectileList[proj].dim/2 && Math.abs(ey - py) < 25+projectileList[proj].dim/2) {
+                enemyList[enemy].hp -= projectileList[proj].dmg;
+                projectileList[proj].timer = 0;
             }
         }
     }
