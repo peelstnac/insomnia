@@ -106,6 +106,33 @@ io.on('connection', (socket) => {
 });
 
 setInterval(() => {
+    //collision damage detection
+    for(var enemy in enemyList) {
+        for(var player in playerList) {
+            var ex = enemyList[enemy].x;
+            var ey = enemyList[enemy].y;
+            var px = playerList[player].x;
+            var py = playerList[player].y;
+            if(Math.abs(ex - px) < 41 && Math.abs(ey - py) < 41) {
+                var temp = playerList[player].hp;
+                playerList[player].hp -= enemyList[enemy].hp;
+                enemyList[enemy].hp -= temp;
+            }
+        }
+    }
+    //check if player is alive
+    for(var player in playerList) {
+        if(playerList[player].hp <= 0) {
+            playerList[player] = new Player(player, playerList[player].name);
+        }
+    }
+    //check if enemy is alive
+    for(var enemy in enemyList) {
+        if(enemyList[enemy].hp <= 0) {
+            enemyList[enemy] = new Enemy('enemy');
+        }
+    }
+
     var packet = {};
     //update enemy positions
     for(enemy in enemyList) {
