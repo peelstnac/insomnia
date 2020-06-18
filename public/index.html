@@ -54,16 +54,6 @@
                     cPlayerList = data.cPlayerList;
                 });
                 socket.on('state', (data) => {
-                    //send key data
-                    var packet = {};
-                    packet.keyArray = keyArray;
-                    socket.emit('keyPress', packet);
-                    //send mouse data
-                    packet = {
-                        x: mx,
-                        y: my
-                    };
-                    socket.emit('cursorMove', packet);
                     //console.log(data);
                     //parse data
                     cEnemyList = data.cEnemyList;
@@ -145,6 +135,16 @@
                 }
                 //interpolate data
                 setInterval(() => {
+                    //send key data
+                    var packet = {};
+                    packet.keyArray = keyArray;
+                    socket.emit('keyPress', packet);
+                    //send mouse data
+                    packet = {
+                        x: mx,
+                        y: my
+                    };
+                    socket.emit('cursorMove', packet);
                     ctx.clearRect(0, 0, WIDTH, HEIGHT);
                     //handle enemies
                     ctx.fillStyle = 'red';
