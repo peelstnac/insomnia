@@ -50,7 +50,7 @@
                 var my = 0;
                 //handle keys
                 var keyArray = [0, 0, 0, 0, 0]; //w, a, s, d, space
-                socket.on('playerPosition', (data) => {
+                socket.on('controllablePositions', (data) => {
                     cPlayerList = data.cPlayerList;
                 });
                 socket.on('state', (data) => {
