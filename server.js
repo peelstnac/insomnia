@@ -96,6 +96,7 @@ class Projectile {
 }
 
 var projectileList = [];
+var cProjectileList = []; //lightweight client version
 
 app.use(express.static(__dirname + '/public'));
 server.listen(process.env.PORT || 3000);
@@ -141,12 +142,33 @@ io.on('connection', (socket) => {
         if(keyArray[4]) {
             if(playerList[id].ammo >= ammo_cost[playerList[id].weapon]) {
                 var proj = new Projectile(playerList[id].x, playerList[id].y, 30, playerList[id].ang, 6, 15, id, 10);
+                //trying to reduce socket load
                 projectileList.push(proj);
+                cProjectileList.push({
+                    x: proj.x,
+                    y: proj.y,
+                    dx: proj.dx,
+                    dy: proj.dy,
+                    timer: proj.timer
+                });
                 playerList[id].ammo[playerList[id].weapon] -= ammo_cost[playerList[id].weapon];
             }
         }
     });
 });
+
+setInterval(() => {
+    var cPlayerList = [];
+    var packet = {};
+    for(player in playerList) {
+        cPlayerList.push({
+            x: playerList[player].x,
+            y: playerList[player].y
+        });
+    }
+    packet.cPlayerList = cPlayerList;
+    io.emit('playerPosition', packet);
+}, 1000/30);
 
 setInterval(() => {
     //collision damage detection
@@ -184,7 +206,6 @@ setInterval(() => {
             var ey = enemyList[enemy].y;
             if(Math.abs(bx - ex) < 25+projectileList[proj].dim/2 && Math.abs(ey - py) < 25+projectileList[proj].dim/2) {
                 enemyList[enemy].hp -= projectileList[proj].dmg;
-                projectileList[proj].timer = 0;
                 if(enemyList[enemy].hp <= 0) {
                     //give killer 30 ammo
                     playerList[projectileList[proj].parent].ammo[0] += 15;
@@ -210,7 +231,6 @@ setInterval(() => {
             projectileList.splice(i, 1); //if not, remove
         }
     }
-
     var packet = {};
     //update enemy positions
     for(enemy in enemyList) {
@@ -225,10 +245,20 @@ setInterval(() => {
     for(proj in projectileList) {
         projectileList[proj].updatePosition();
     }
-    packet.enemyList = enemyList;
-    //add players to state
-    packet.playerList = playerList;
-    //add projectiles to state
-    //packet.projectileList = projectileList;
+
+    var cEnemyList = [];
+    
+    for(var enemy in enemyList) {
+        cEnemyList.push({
+            x: enemyList[enemy].x,
+            y: enemyList[enemy].y,
+            dx: enemyList[enemy].dx,
+            dy: enemyList[enemy].dy
+        });
+    }
+
+    packet.cEnemyList = cEnemyList;
+    packet.cProjectileList = cProjectileList;
     io.emit('state', packet);
+    cProjectileList = []; //clear the client list to reduce load 
 }, 1000/15);
