@@ -25,7 +25,7 @@ class Enemy {
     dy = Math.sin(this.ang) * this.vel;
     //fixed size for now
     dim = 50;
-    hp = 2;
+    hp = 20;
 
     updatePosition() {
         //collision detection
@@ -67,10 +67,10 @@ class Player {
     updatePosition() {
         //collision detection
         if(this.x <= 0 || this.x + this.dim/2 >= WIDTH) {
-            this.dx = -this.dx;
+            this.dx = 0;
         }
         if(this.y <= 0 || this.y + this.dim/2 >= HEIGHT) {
-            this.dy = -this.dy;
+            this.dy = 0;
         }
         this.x += this.dx;
         this.y += this.dy;
@@ -156,7 +156,7 @@ io.on('connection', (socket) => {
         //shoot key
         if(keyArray[4]) {
             if(playerList[id].ammo >= ammo_cost[playerList[id].weapon]) {
-                var proj = new Projectile(playerList[id].x, playerList[id].y, 30, playerList[id].ang, 6, 50, id, 10);
+                var proj = new Projectile(playerList[id].x, playerList[id].y, 45, playerList[id].ang, 6, 15, id, 5);
                 //trying to reduce socket load
                 projectileList.push(proj);
                 //less information for client
@@ -225,7 +225,6 @@ setInterval(() => {
             var ey = enemyList[enemy].y;
             if(Math.abs(bx - ex) < 25+projectileList[proj].dim/2 && Math.abs(by - ey) < 25+projectileList[proj].dim/2) {
                 enemyList[enemy].hp -= projectileList[proj].dmg;
-                console.log("HIT");
                 if(enemyList[enemy].hp <= 0) {
                     //give killer 30 ammo
                     playerList[projectileList[proj].parent].ammo[0] += 15;
@@ -257,7 +256,7 @@ setInterval(() => {
         enemyList[enemy].updatePosition();
     }
     //generate enemies if there are less than 10
-    while(enemyCount < 1) {
+    while(enemyCount < 10) {
         enemyCount++;
         enemyList.push(new Enemy('test'));
     }
