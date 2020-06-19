@@ -135,10 +135,10 @@ io.on('connection', (socket) => {
         playerList[id].dx = 0;
         playerList[id].dy = 0;
         if(keyArray[0]) {
-            if(playerList[id].y >= HEIGHT + 32/2) playerList[id].dy = -playerList[id].vel / Math.sqrt(2);
+            if(playerList[id].y >= 32/2) playerList[id].dy = -playerList[id].vel / Math.sqrt(2);
         }
         if(keyArray[1]) {
-            if(playerList[id].x >= WIDTH + 32/2) playerList[id].dx = -playerList[id].vel / Math.sqrt(2);
+            if(playerList[id].x >= 32/2) playerList[id].dx = -playerList[id].vel / Math.sqrt(2);
         }
         if(keyArray[2]) {
             if(playerList[id].y <= HEIGHT - 32/2) playerList[id].dy = playerList[id].vel / Math.sqrt(2);
