@@ -18,15 +18,25 @@ const LEVELS = require('./level.js');
     var time = 1; //day 1, night 0
     setInterval(() => {
         time = ~time&1;
-    }, 90000);
+    }, 15000);
     //handle player respawns
     function playerRespawn(player) {
         //15 second respawn wait
         player.respawn();
         setTimeout(() => {
             playerList[player.id] = player;
+            aliveCount++;
         }, 5000);
     }
+    //begin game
+    function startGame() {
+
+    }
+    function endGame() {
+        
+    }
+    //number of players alive
+    var aliveCount = 0;
 
     var enemyCount = 0;
     var enemyList = [];
@@ -149,6 +159,7 @@ const LEVELS = require('./level.js');
         var id = uuidv4(); //create unique ID for player
         socketList[id] = socket;
         playerList[id] = new Player(id, 'hope');
+        aliveCount++;
 
         socket.on('disconnect', () => {
             console.log('player disconnect.');
@@ -271,6 +282,7 @@ const LEVELS = require('./level.js');
             if(playerList[id].hp <= 0) {
                 playerRespawn(playerList[id]);
                 delete playerList[id];
+                aliveCount--;
             }
         }
         //check if enemy is alive
