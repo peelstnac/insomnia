@@ -12,4 +12,6 @@ class Level {
     }
 }
 
-module.exports = Level;
+LEVELS = [];
+
+module.exports = LEVELS;

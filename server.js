@@ -1,16 +1,17 @@
 'use strict';
-
-const app = require('express')();
+//networking
 const express = require('express');
+const app = express();
 const server = require('http').Server(app);
 const io = require('socket.io')(server);
+//uuid
 const { v4: uuidv4 } = require('uuid');
-
+//game constants
 const WIDTH = 1280;
 const HEIGHT = 720;
 const PI = Math.PI;
-
-const Level = require('./level.js');
+//game levels
+const LEVELS = require('./level.js');
 
 (() => {
     //handle day and night cycle
@@ -26,7 +27,8 @@ const Level = require('./level.js');
         constructor(name, enemyStrengthIndex) {
             this.name = name;
             this.enemyStrengthIndex = enemyStrengthIndex;
-            this.hp = 19 + this.enemyStrengthIndex;
+            //this.hp = 19 + this.enemyStrengthIndex;
+            this.hp = 20;
         }
         //enemies spawn in the middle of map
         x = WIDTH/2;
