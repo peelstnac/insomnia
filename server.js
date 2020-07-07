@@ -19,6 +19,14 @@ const LEVELS = require('./level.js');
     setInterval(() => {
         time = ~time&1;
     }, 90000);
+    //handle player respawns
+    function playerRespawn(player) {
+        //15 second respawn wait
+        player.respawn();
+        setTimeout(() => {
+            playerList[player.id] = player;
+        }, 5000);
+    }
 
     var enemyCount = 0;
     var enemyList = [];
@@ -79,10 +87,18 @@ const LEVELS = require('./level.js');
         deaths = 0;
         ammo = 300;
         weapon = 0; //type of weapon equipped
+        canTakeDamage = false; //default false
 
         updatePosition() {
             this.x += this.dx;
             this.y += this.dy;
+        }
+
+        respawn() {
+            this.hp = 150;
+            this.ammo = 300;
+            this.x = Math.floor(Math.random() * WIDTH);
+            this.y = Math.floor(Math.random() * HEIGHT);
         }
     }
 
@@ -141,6 +157,7 @@ const LEVELS = require('./level.js');
         });
 
         socket.on('cursorMove', (data) => {
+            if(!(id in playerList)) return;
             //calculate angle of cursor relative to player position
             var ang = Math.atan2(data.y - playerList[id].y, data.x - playerList[id].x);
             playerList[id].ang = ang;
@@ -148,6 +165,7 @@ const LEVELS = require('./level.js');
 
         socket.on('keyPress', (data) => {
             var keyArray = data.keyArray;
+            if(!(id in playerList)) return;
             playerList[id].dx = 0;
             playerList[id].dy = 0;
             if(keyArray[0]) {
@@ -242,9 +260,17 @@ const LEVELS = require('./level.js');
             }
         }
         //check if player is alive
+        /*
         for(var player in playerList) {
             if(playerList[player].hp <= 0) {
                 playerList[player] = new Player(player, playerList[player].name);
+            }
+        }
+        */
+        for(let id in playerList) {
+            if(playerList[id].hp <= 0) {
+                playerRespawn(playerList[id]);
+                delete playerList[id];
             }
         }
         //check if enemy is alive
