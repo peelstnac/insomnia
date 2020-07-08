@@ -11,9 +11,16 @@ const WIDTH = 1280;
 const HEIGHT = 720;
 const PI = Math.PI;
 //game levels
-const LEVELS = require("./level.js");
+const Level = require('./level');
 
 (() => {
+  //temp gen levels for now
+  var levels = ['DEFAULT'];
+  for(let i = 1; i <= 100; i++) {
+    levels.push(new Level(i, -1, i));
+  }
+
+  var game = levels[1];
   //handle day and night cycle
   var time = 1; //day 1, night 0
   setInterval(() => {
@@ -29,8 +36,12 @@ const LEVELS = require("./level.js");
     }, 5000);
   }
   //begin game
-  function startGame() {}
-  function endGame() {}
+  function startGame() {
+    game = levels[1];
+  }
+  function endGame() {
+    startGame();
+  }
   //number of players alive
   var aliveCount = 0;
 
@@ -41,8 +52,8 @@ const LEVELS = require("./level.js");
     constructor(name, enemyStrengthIndex) {
       this.name = name;
       this.enemyStrengthIndex = enemyStrengthIndex;
-      //this.hp = 19 + this.enemyStrengthIndex;
-      this.hp = 20;
+      this.hp = 19 + this.enemyStrengthIndex;
+      //this.hp = 20;
     }
     //enemies spawn in the middle of map
     x = WIDTH / 2;
@@ -305,9 +316,10 @@ const LEVELS = require("./level.js");
       }
     }
     //check if enemy is alive
-    for (var enemy in enemyList) {
-      if (enemyList[enemy].hp <= 0) {
-        enemyList[enemy] = new Enemy("enemy");
+    for (let i = enemyList.length - 1; i >= 0; i--) {
+      if (enemyList[i].hp <= 0) {
+        enemyCount--;
+        enemyList.splice(i, 1);
       }
     }
     //check if projectile is alive
@@ -322,9 +334,18 @@ const LEVELS = require("./level.js");
       enemyList[enemy].updatePosition();
     }
     //generate enemies if there are less than 10
-    while (enemyCount < 10) {
-      enemyCount++;
-      enemyList.push(new Enemy("test"));
+    if (enemyCount === 0) {
+      if (game.level === 100) {
+        //temp game ending
+        console.log("You've beat the game");
+        startGame();
+        return;
+      }
+      game = levels[game.level++];
+      while (enemyCount < game.enemyCount) {
+        enemyCount++;
+        enemyList.push(new Enemy("test", game.enemyStrengthIndex));
+      }
     }
     //update projectile positions
     for (proj in projectileList) {
