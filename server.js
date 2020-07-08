@@ -333,6 +333,14 @@ const Level = require('./level');
     for (enemy in enemyList) {
       enemyList[enemy].updatePosition();
     }
+    if (aliveCount === 0) {
+      enemyList = [];
+      startGame();
+      for (let i = 0; i < game.enemyCount; i++) {
+        enemyList.push(new Enemy("test", game.enemyStrengthIndex));
+      }
+      enemyCount = game.enemyCount;
+    }
     //generate enemies if there are less than 10
     if (enemyCount === 0) {
       if (game.level === 100) {
